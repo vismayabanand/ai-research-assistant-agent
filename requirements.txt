@@ -1,0 +1,11 @@
+langchain
+langchain-community        # for document loaders like PyPDFLoader
+langgraph                  # for the Graph / Node / Transition API
+pypdf                      # PDF parsing backend for PyPDFLoader
+chromadb
+faiss-cpu
+python-dotenv
+requests
+fastapi
+uvicorn
+pytest

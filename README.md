@@ -24,7 +24,7 @@ This project is part of CS180 Summer 2025 Lab and focuses on building an AI agen
 
 - **LangChain**: LLM orchestration and tool integration
 - **LangGraph**: Agent state management and planning
-- **OpenAI GPT**: LLM backend for summarization and reasoning
+- **GENAI GPT**: LLM backend for summarization and reasoning
 - **ArXiv/Semantic Scholar APIs**: External paper sources
 - **ChromaDB / FAISS**: Vector database for RAG
 
