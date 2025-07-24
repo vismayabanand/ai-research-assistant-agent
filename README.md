@@ -21,40 +21,8 @@ Starting research on a new academic topic can be overwhelming. This project tack
 
 The project's workflow is managed by a LangGraph state machine. This graph ensures that each step is executed in the correct order and that the state (like the list of papers and processed text) is passed between them reliably.
 
-```mermaid
-%% AI Research Assistant Workflow Diagram
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/f25cc237-98df-4d6d-9d9f-18b9b93e3752" />
 
-graph TD
-    subgraph "I. Research & Planning Phase (LangGraph Workflow)"
-        A(User enters Topic & clicks 'Start Research' in UI) --> B[1. Fetch Papers];
-        B -- Calls --> API[ArXiv / Semantic Scholar API];
-        B --> C{Papers Found?};
-        C -- No --> End[End Workflow];
-        C -- Yes --> D[2. Process PDFs];
-        D -- Downloads & Extracts Full Text --> PDF[(PDF Loader & Text Splitter)];
-        D --> E{Any Papers Processed?};
-        E -- No --> End;
-        E -- Yes --> F[3. Plan Reading];
-        F -- Uses LLM to create logical order --> LLM[Google Gemini LLM];
-        F --> G[4. Build RAG Database];
-        G -- Stores text chunks as vectors --> VDB[(ChromaDB Vector Store)];
-    end
-
-    subgraph "II. Interactive Q&A Phase (In UI)"
-        G --> H(Display Reading Plan & Activate Q&A);
-        H --> I{User Asks Question};
-        I --> J[Retrieve Relevant Chunks];
-        J -- Searches --> VDB;
-        J --> K[Generate Answer];
-        K -- Uses context from chunks --> LLM;
-        K --> L(Display Answer in UI);
-        L --> I;
-    end
-
-    %% Styling
-    style End fill:#ffdddd,stroke:#333,stroke-width:2px
-    style H fill:#ddffdd,stroke:#333,stroke-width:2px
-```
 
 ## Tech Stack
 
