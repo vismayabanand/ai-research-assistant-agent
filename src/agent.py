@@ -1,9 +1,7 @@
-# src/agent.py
 import os
 from typing import List, Dict, Any, TypedDict
 from langgraph.graph import StateGraph, END
 
-# Import your project's functions
 from .retrieval import fetch_arxiv, fetch_semantic_scholar, PDFLoaderTool
 from .planner import plan_reading_with_llm
 from .rag_qa import build_rag
@@ -11,7 +9,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import requests
 import time
 
-# -- 1. Define the State --
+# Define the State that our agent will use.
 class AgentState(TypedDict):
     query: str
     source: str
@@ -20,8 +18,7 @@ class AgentState(TypedDict):
     rag_collection: Any
     reading_plan: List[Dict[str, Any]]
 
-# -- 2. Define the Nodes --
-
+# Define the Nodes.
 def fetch_papers_node(state: AgentState) -> Dict[str, Any]:
     """Fetches the initial list of papers."""
     print("--- 1. FETCHING PAPERS ---")
@@ -41,7 +38,6 @@ def fetch_papers_node(state: AgentState) -> Dict[str, Any]:
 def process_pdfs_node(state: AgentState) -> Dict[str, Any]:
     """Downloads PDFs, extracts text, and chunks it."""
     print("\n--- 2. PROCESSING FULL TEXT ---")
-    # ... (This function's internal code remains the same as before)
     papers = state["papers"]
     PDF_DIR = "./temp_pdfs"
     os.makedirs(PDF_DIR, exist_ok=True)
@@ -77,7 +73,6 @@ def plan_reading_node(state: AgentState) -> Dict[str, Any]:
 def build_rag_node(state: AgentState) -> Dict[str, Any]:
     """Builds the RAG database from the processed paper chunks."""
     print("\n--- 4. BUILDING RAG DATABASE ---")
-    # ... (This function's internal code remains the same as before)
     all_chunks = []
     all_metadatas = []
     for paper in state["processed_papers"]:
@@ -90,9 +85,6 @@ def build_rag_node(state: AgentState) -> Dict[str, Any]:
     print(f"Database built with {len(all_chunks)} text chunks.")
     return {"rag_collection": collection}
 
-# -- 3. Define the Graph Edges --
-# **MODIFIED LOGIC**
-# We now have two separate decision functions.
 
 def decide_to_process(state: AgentState) -> str:
     """Determines whether to process PDFs or end."""
@@ -110,7 +102,6 @@ def decide_to_plan(state: AgentState) -> str:
     else:
         return "plan"
 
-# -- 4. Assemble the Graph --
 workflow = StateGraph(AgentState)
 
 workflow.add_node("fetch", fetch_papers_node)
@@ -120,7 +111,6 @@ workflow.add_node("build_rag", build_rag_node)
 
 workflow.set_entry_point("fetch")
 
-# **MODIFIED GRAPH WIRING**
 workflow.add_conditional_edges(
     "fetch",
     decide_to_process,
@@ -137,9 +127,7 @@ workflow.add_conditional_edges(
         "end": END,
     },
 )
-
 workflow.add_edge("plan", "build_rag")
 workflow.add_edge("build_rag", END)
 
-# Compile the graph into a runnable app
 app = workflow.compile()

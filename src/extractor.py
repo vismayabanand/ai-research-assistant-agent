@@ -1,16 +1,13 @@
-# src/extractor.py
 import os, json, re, google.generativeai as genai
 from pathlib import Path
 from dotenv import load_dotenv
 from typing import Dict, Any, List
 
-# ── Load .env safely ──────────────────────────────────────────────────────
 load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=True)
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 MODEL_NAME = "gemini-1.5-flash-latest"          # or gemini-1.5-pro-latest
 
-# ── Helper to pull the first {...} block out of the response  ─────────────
 _json_block = re.compile(r"\{.*?}", re.DOTALL)
 
 def _extract_json(raw: str) -> Dict[str, Any]:
@@ -19,7 +16,6 @@ def _extract_json(raw: str) -> Dict[str, Any]:
         raise ValueError("LLM response contained no JSON block")
     return json.loads(m.group(0))
 
-# ── Core functions ────────────────────────────────────────────────────────
 def extract_insights(summary: Dict[str, Any]) -> Dict[str, Any]:
     prompt = f"""
 You are an academic assistant.
@@ -35,12 +31,7 @@ Extract three *lists* with keys exactly:
 Return **ONLY** a valid JSON object — no markdown, no code block, no extra text.
 """
     resp = genai.GenerativeModel(MODEL_NAME).generate_content(prompt)
-    
-    # **MODIFIED CODE**
-    # Extract the new data from the LLM response
     new_data = _extract_json(resp.text)
-    
-    # Update the original summary dictionary with the new insights and return it
     summary.update(new_data)
     return summary
 

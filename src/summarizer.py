@@ -1,18 +1,3 @@
-# src/summarizer.py
-"""Generate structured (JSON) summaries for research papers using Gemini 1.5.
-
-This module:
-  • Loads the Google API key from the project‑root .env
-  • Calls the Gemini 1.5 model to summarise a paper into introduction / methods / conclusion
-  • Preserves identity fields (title, url, authors) so later stages—insight extraction,
-    reading‑plan, RAG—don’t lose them.
-  • Provides a helper to parse JSON even if the model wraps it in prose or fences.
-
-Functions exported:
-    summarize_paper(paper: dict)  -> dict
-    summarize_papers(papers)      -> list[dict] | dict
-"""
-
 from __future__ import annotations
 
 import os
@@ -24,20 +9,15 @@ from typing import Dict, Any, List
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-# ── Environment ------------------------------------------------------------
 load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=True)
 
-GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]  # raises KeyError if missing
-
-# Configure Gemini once for the whole module
+GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# ── Model / generation settings -------------------------------------------
-MODEL_NAME = "gemini-1.5-flash-latest"  # switch to "gemini-1.5-pro-latest" if desired
+MODEL_NAME = "gemini-1.5-flash-latest"
 MAX_TOKENS = 256
 
-# ── Helpers ----------------------------------------------------------------
-_json_block = re.compile(r"\{[\s\S]*?\}")  # non‑greedy match of first {...}
+_json_block = re.compile(r"\{[\s\S]*?\}")
 
 def _extract_json(raw: str) -> Dict[str, Any]:
     """Extract first JSON object from LLM response (ignores extra prose or fences)."""
@@ -45,8 +25,6 @@ def _extract_json(raw: str) -> Dict[str, Any]:
     if not m:
         raise ValueError("LLM response contained no JSON object")
     return json.loads(m.group(0))
-
-# ── Core API ----------------------------------------------------------------
 
 def summarize_paper(paper: Dict[str, Any]) -> Dict[str, Any]:
     """Return a structured JSON summary for a single paper.
@@ -74,7 +52,6 @@ Abstract: {paper['summary']}
 
     data = _extract_json(response.text)
 
-    # Safety net: ensure identity fields are present
     data.setdefault("title", paper["title"])
     data.setdefault("url", paper["url"])
     data.setdefault("authors", paper["authors"])

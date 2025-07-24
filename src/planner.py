@@ -3,12 +3,7 @@ import re
 from typing import List, Dict, Any
 import google.generativeai as genai
 
-# This is your original sorting function, which is still useful.
 def sort_papers_by_insight(insights_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Sort papers so the most contribution-rich (and least gap-heavy) appear first.
-    Tie-break alphabetically on title for deterministic output.
-    """
     def score(item: Dict[str, Any]):
         contribs = item.get("contributions", []) or []
         gaps     = item.get("gaps", []) or []
@@ -16,17 +11,11 @@ def sort_papers_by_insight(insights_list: List[Dict[str, Any]]) -> List[Dict[str
 
     return sorted(insights_list, key=score)
 
-# **NEW LLM-POWERED PLANNER**
+#NEW LLM-POWERED PLANNER
 def plan_reading_with_llm(papers: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Uses an LLM to create a logical reading plan based on paper titles and summaries.
-    """
     print("  Generating an intelligent reading plan with an LLM...")
-    
-    # Prepare a simplified list of papers for the prompt
     prompt_papers = [f"Title: {p.get('title', 'Untitled')}\nSummary: {p.get('summary', '')}" for p in papers]
     prompt_context = "\n\n---\n\n".join(prompt_papers)
-
     prompt = f"""
 You are an academic advisor. Based on the following research paper titles and summaries, create a logical reading plan for a student new to the topic.
 
@@ -40,23 +29,14 @@ Here are the papers:
     try:
         model = genai.GenerativeModel("gemini-1.5-flash-latest")
         response = model.generate_content(prompt)
-
-        # The LLM returns a numbered list as a string. We parse it.
         ordered_titles = [line.strip() for line in re.findall(r'^\d+\.\s*(.*)', response.text, re.MULTILINE)]
-        
         if not ordered_titles:
             print("    LLM planner did not return a valid list. Returning original order.")
             return papers
-
-        # Create a mapping of title to the original paper object
         paper_map = {p.get('title'): p for p in papers}
-
         # Reorder the original list of papers based on the LLM's suggested title order
         ordered_papers = [paper_map[title] for title in ordered_titles if title in paper_map]
-        
-        # Add any papers the LLM might have missed to the end
         missing_papers = [p for p in papers if p.get('title') not in ordered_titles]
-        
         return ordered_papers + missing_papers
 
     except Exception as e:
