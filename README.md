@@ -17,11 +17,11 @@ Starting research on a new academic topic can be overwhelming. This project tack
 * **Interactive RAG Q&A**: Builds a vector knowledge base using **ChromaDB**. It then allows you to ask specific questions and get answers grounded directly in the content of the source documents using a Retrieval-Augmented Generation (RAG) pipeline.
 * **Simple Web UI**: An interactive user interface built with **Streamlit** allows for easy interaction with the agent without needing to use the command line.
 
-## 🏛️ Architecture & Workflow
+##  Architecture & Workflow
 
 The project's workflow is managed by a LangGraph state machine. This graph ensures that each step is executed in the correct order and that the state (like the list of papers and processed text) is passed between them reliably.
 
-<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/f25cc237-98df-4d6d-9d9f-18b9b93e3752" />
+<img width="400" height="500" alt="image" src="https://github.com/user-attachments/assets/f25cc237-98df-4d6d-9d9f-18b9b93e3752" />
 
 ##  Tech Stack
 
