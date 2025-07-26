@@ -31,7 +31,7 @@ The project's workflow is managed by a LangGraph state machine. This graph ensur
 * **UI**: Streamlit
 * **Core Libraries**: LangChain, Pydantic, Requests
 
-## ⚙️ Setup and Installation
+##  Setup and Installation
 
 Follow these steps to set up the project locally.
 
